@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BITOTXT — Text ↔ Binary</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #F5F5F5;
+            --text: #1A1A1A;
+            --accent: #FF3333;
+            --border: #1A1A1A;
+            --input-bg: #FFFFFF;
+            --gray: #999999;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding: 48px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 24px;
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            margin-bottom: 48px;
+        }
+
+        h1 {
+            font-size: 72px;
+            font-weight: 700;
+            letter-spacing: -3px;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 48px;
+                letter-spacing: -2px;
+            }
+        }
+
+        .tagline {
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--gray);
+        }
+
+        .converter {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            flex: 1;
+        }
+
+        @media (max-width: 768px) {
+            .converter {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .panel-label {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--gray);
+        }
+
+        .mode-toggle {
+            display: flex;
+            border: 2px solid var(--border);
+        }
+
+        .mode-btn {
+            padding: 10px 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-family: inherit;
+        }
+
+        .mode-btn:first-child {
+            border-right: 2px solid var(--border);
+        }
+
+        .mode-btn.active {
+            background: var(--text);
+            color: var(--bg);
+        }
+
+        .mode-btn:not(.active):hover {
+            background: var(--border);
+            color: var(--bg);
+        }
+
+        textarea {
+            flex: 1;
+            min-height: 200px;
+            padding: 20px;
+            font-family: "JetBrains Mono", monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            border: 2px solid var(--border);
+            background: var(--input-bg);
+            resize: none;
+            outline: none;
+            transition: border-color 0.15s ease;
+        }
+
+        textarea:focus {
+            border-color: var(--accent);
+        }
+
+        textarea::placeholder {
+            color: var(--gray);
+        }
+
+        textarea[readonly] {
+            background: var(--bg);
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            padding: 16px 32px;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 2px solid var(--border);
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.15s ease;
+        }
+
+        .btn-primary {
+            background: var(--text);
+            color: var(--bg);
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background: var(--text);
+            color: var(--bg);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--text);
+            color: var(--bg);
+            padding: 12px 24px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        footer {
+            margin-top: 48px;
+            padding-top: 24px;
+            border-top: 1px solid var(--gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-text {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--gray);
+        }
+
+        .error-msg {
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            min-height: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>BITOTXT</h1>
+            <p class="tagline">Text ↔ Binary Converter</p>
+        </header>
+
+        <div class="converter">
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-label">Input</span>
+                    <div class="mode-toggle">
+                        <button class="mode-btn active" data-mode="encode">Encode</button>
+                        <button class="mode-btn" data-mode="decode">Decode</button>
+                    </div>
+                </div>
+                <textarea id="input" placeholder="Enter text or binary here..."></textarea>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-label">Output</span>
+                    <span class="error-msg" id="error"></span>
+                </div>
+                <textarea id="output" readonly placeholder="Result will appear here..."></textarea>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="btn btn-primary" id="convert">Convert</button>
+            <button class="btn btn-secondary" id="copy">Copy</button>
+            <button class="btn btn-secondary" id="clear">Clear</button>
+        </div>
+
+        <footer>
+            <span class="footer-text">Swiss Style Binary Converter</span>
+            <span class="footer-text">2026</span>
+        </footer>
+    </div>
+
+    <div class="toast" id="toast">Copied to clipboard</div>
+
+    <script>
+        let currentMode = 'encode';
+
+        const inputEl = document.getElementById('input');
+        const outputEl = document.getElementById('output');
+        const convertBtn = document.getElementById('convert');
+        const copyBtn = document.getElementById('copy');
+        const clearBtn = document.getElementById('clear');
+        const modeBtns = document.querySelectorAll('.mode-btn');
+        const errorEl = document.getElementById('error');
+        const toastEl = document.getElementById('toast');
+
+        function textToBinary(str) {
+            return str.split('')
+                .map(c => c.charCodeAt(0).toString(2).padStart(8, '0'))
+                .join('');
+        }
+
+        function binaryToText(binary) {
+            const cleanBinary = binary.replace(/\s/g, '');
+            if (!/^[01]+$/.test(cleanBinary)) {
+                throw new Error('Invalid binary string');
+            }
+            const bytes = cleanBinary.match(/.{1,8}/g) || [];
+            return bytes.map(b => String.fromCharCode(parseInt(b, 2))).join('');
+        }
+
+        function convert() {
+            errorEl.textContent = '';
+            const input = inputEl.value;
+
+            if (!input.trim()) {
+                errorEl.textContent = 'Please enter some text';
+                return;
+            }
+
+            try {
+                if (currentMode === 'encode') {
+                    const result = textToBinary(input);
+                    outputEl.value = result;
+                } else {
+                    const result = binaryToText(input);
+                    outputEl.value = result;
+                }
+            } catch (e) {
+                errorEl.textContent = e.message || 'Conversion error';
+            }
+        }
+
+        function copyToClipboard() {
+            const output = outputEl.value;
+            if (!output) return;
+
+            navigator.clipboard.writeText(output).then(() => {
+                showToast();
+            });
+        }
+
+        function clearAll() {
+            inputEl.value = '';
+            outputEl.value = '';
+            errorEl.textContent = '';
+        }
+
+        function showToast() {
+            toastEl.classList.add('show');
+            setTimeout(() => {
+                toastEl.classList.remove('show');
+            }, 2000);
+        }
+
+        modeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                modeBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentMode = btn.dataset.mode;
+                clearAll();
+            });
+        });
+
+        convertBtn.addEventListener('click', convert);
+        copyBtn.addEventListener('click', copyToClipboard);
+        clearBtn.addEventListener('click', clearAll);
+
+        inputEl.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                convert();
+            }
+        });
+    </script>
+</body>
+</html>
