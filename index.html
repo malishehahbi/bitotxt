@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BITOTXT — Text ↔ Binary</title>
+    <title>BITOTXT — Binary Converter</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after {
             box-sizing: border-box;
@@ -15,122 +15,141 @@
         }
 
         :root {
-            --bg: #F5F5F5;
-            --text: #1A1A1A;
-            --accent: #FF3333;
-            --border: #1A1A1A;
-            --input-bg: #FFFFFF;
-            --gray: #999999;
+            --bg: #FDF6E3;
+            --bg-darker: #F5ECD8;
+            --text: #0F0F0F;
+            --accent: #E63900;
+            --accent-light: #FF5722;
+            --border: #0F0F0F;
+            --muted: #6B6B6B;
+            --safe-area-top: env(safe-area-inset-top, 0px);
+            --safe-area-bottom: env(safe-area-inset-bottom, 0px);
         }
 
-        html, body {
-            height: 100%;
+        html {
+            font-size: 16px;
         }
 
         body {
-            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--bg);
             color: var(--text);
-            display: flex;
-            flex-direction: column;
             min-height: 100vh;
-            padding: 48px;
+            line-height: 1.5;
+            overflow-x: hidden;
         }
 
-        @media (max-width: 768px) {
-            body {
-                padding: 24px;
-            }
-        }
-
-        .container {
-            max-width: 1200px;
-            width: 100%;
+        .page {
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: auto 1fr auto;
+            min-height: 100vh;
+            max-width: 1400px;
             margin: 0 auto;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
+            padding: clamp(16px, 4vw, 64px);
+            padding-top: calc(clamp(16px, 4vw, 64px) + var(--safe-area-top));
+            padding-bottom: calc(clamp(16px, 4vw, 64px) + var(--safe-area-bottom));
         }
 
         header {
-            margin-bottom: 48px;
-        }
-
-        h1 {
-            font-size: 72px;
-            font-weight: 700;
-            letter-spacing: -3px;
-            line-height: 1;
-            margin-bottom: 8px;
-        }
-
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 48px;
-                letter-spacing: -2px;
-            }
-        }
-
-        .tagline {
-            font-size: 14px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--gray);
-        }
-
-        .converter {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            flex: 1;
-        }
-
-        @media (max-width: 768px) {
-            .converter {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .panel {
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding-bottom: clamp(24px, 5vw, 64px);
+            border-bottom: 3px solid var(--border);
+            position: relative;
             gap: 16px;
         }
 
-        .panel-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+        .brand {
+            position: relative;
+            min-width: 0;
         }
 
-        .panel-label {
-            font-size: 12px;
-            font-weight: 700;
+        h1 {
+            font-family: "Bebas Neue", Impact, sans-serif;
+            font-size: clamp(48px, 14vw, 220px);
+            line-height: 0.85;
+            letter-spacing: -0.02em;
+            color: var(--text);
+            position: relative;
+            white-space: nowrap;
+        }
+
+        h1::after {
+            content: "BITOTXT";
+            position: absolute;
+            left: 2px;
+            top: 2px;
+            color: transparent;
+            -webkit-text-stroke: 2px var(--accent);
+            z-index: -1;
+        }
+
+        .subtitle {
+            font-size: clamp(10px, 1.2vw, 14px);
+            font-weight: 500;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--gray);
+            letter-spacing: 0.3em;
+            color: var(--muted);
+            margin-top: 4px;
         }
 
-        .mode-toggle {
+        .mode-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .mode-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--muted);
+        }
+
+        .mode-switch {
             display: flex;
             border: 2px solid var(--border);
+            background: var(--bg);
         }
 
         .mode-btn {
-            padding: 10px 20px;
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            padding: 10px 16px;
+            min-height: 48px;
+            min-width: 48px;
+            font-family: "Bebas Neue", Impact, sans-serif;
+            font-size: 16px;
+            letter-spacing: 0.1em;
             background: transparent;
             border: none;
             cursor: pointer;
-            transition: all 0.15s ease;
-            font-family: inherit;
+            transition: all 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            color: var(--muted);
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            line-height: 1.1;
         }
 
-        .mode-btn:first-child {
+        .btn-label {
+            font-size: 16px;
+        }
+
+        .btn-sub {
+            font-size: 9px;
+            font-family: "IBM Plex Mono", monospace;
+            letter-spacing: 0.05em;
+            opacity: 0.7;
+        }
+
+        .mode-btn:not(:last-child) {
             border-right: 2px solid var(--border);
         }
 
@@ -140,22 +159,105 @@
         }
 
         .mode-btn:not(.active):hover {
-            background: var(--border);
+            background: var(--accent);
             color: var(--bg);
+            border-color: var(--accent);
+        }
+
+        .mode-btn:not(.active):active {
+            background: var(--accent);
+            color: var(--bg);
+        }
+
+        main {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(16px, 3vw, 48px);
+            padding: clamp(24px, 5vw, 64px) 0;
+        }
+
+        @media (max-width: 900px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            main {
+                gap: 20px;
+                padding: 20px 0;
+            }
+        }
+
+        @media (orientation: landscape) and (max-height: 500px) {
+            main {
+                grid-template-columns: 1fr 1fr;
+                gap: 16px;
+                padding: 16px 0;
+            }
+
+            .input-area {
+                min-height: 150px;
+            }
+
+            .stats {
+                padding-top: 12px;
+            }
+        }
+
+        .panel {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .panel-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.25em;
+            color: var(--muted);
+        }
+
+        .panel-label::before {
+            content: "";
+            width: 24px;
+            height: 2px;
+            background: var(--accent);
+        }
+
+        .input-area {
+            position: relative;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         textarea {
             flex: 1;
-            min-height: 200px;
+            min-height: clamp(180px, 35vh, 400px);
             padding: 20px;
-            font-family: "JetBrains Mono", monospace;
-            font-size: 14px;
-            line-height: 1.6;
-            border: 2px solid var(--border);
-            background: var(--input-bg);
+            font-family: "IBM Plex Mono", monospace;
+            font-size: clamp(14px, 1.2vw, 16px);
+            line-height: 1.7;
+            border: 3px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
             resize: none;
             outline: none;
-            transition: border-color 0.15s ease;
+            transition: border-color 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        @media (max-width: 600px) {
+            textarea {
+                min-height: 160px;
+                padding: 16px;
+                font-size: 14px;
+            }
         }
 
         textarea:focus {
@@ -163,41 +265,93 @@
         }
 
         textarea::placeholder {
-            color: var(--gray);
+            color: var(--muted);
+            opacity: 0.6;
         }
 
         textarea[readonly] {
-            background: var(--bg);
+            background: var(--bg-darker);
+        }
+
+        .char-count {
+            position: absolute;
+            bottom: 12px;
+            right: 16px;
+            font-size: 10px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--muted);
+            pointer-events: none;
+        }
+
+        @media (max-width: 600px) {
+            .char-count {
+                bottom: 8px;
+                right: 12px;
+            }
         }
 
         .actions {
             display: flex;
             gap: 12px;
-            margin-top: 24px;
+            padding-top: 24px;
+        }
+
+        @media (max-width: 600px) {
+            .actions {
+                gap: 8px;
+                padding-top: 16px;
+            }
         }
 
         .btn {
-            padding: 16px 32px;
-            font-size: 14px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border: 2px solid var(--border);
+            padding: 16px 24px;
+            min-height: 56px;
+            font-family: "Bebas Neue", Impact, sans-serif;
+            font-size: 18px;
+            letter-spacing: 0.15em;
+            border: 3px solid var(--border);
             cursor: pointer;
-            font-family: inherit;
-            transition: all 0.15s ease;
+            transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            text-transform: uppercase;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
-        .btn-primary {
+        @media (max-width: 600px) {
+            .btn {
+                padding: 14px 16px;
+                min-height: 52px;
+                font-size: 16px;
+            }
+        }
+
+        .btn-convert {
+            flex: 1;
             background: var(--text);
             color: var(--bg);
-            flex: 1;
         }
 
-        .btn-primary:hover {
+        .btn-convert:hover {
             background: var(--accent);
             border-color: var(--accent);
-            color: white;
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 var(--border);
+        }
+
+        @media (hover: none) {
+            .btn-convert:hover {
+                transform: none;
+                box-shadow: none;
+            }
+        }
+
+        .btn-convert:active {
+            transform: translate(0, 0);
+            box-shadow: none;
+            background: var(--accent);
+            border-color: var(--accent);
         }
 
         .btn-secondary {
@@ -210,91 +364,263 @@
             color: var(--bg);
         }
 
-        .toast {
-            position: fixed;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
+        .btn-secondary:active {
             background: var(--text);
             color: var(--bg);
-            padding: 12px 24px;
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            opacity: 0;
-            transition: all 0.3s ease;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: calc(24px + var(--safe-area-bottom));
+            left: 50%;
+            transform: translateX(-50%) translateY(120%);
+            background: var(--accent);
+            color: white;
+            padding: 14px 28px;
+            font-family: "Bebas Neue", Impact, sans-serif;
+            font-size: 16px;
+            letter-spacing: 0.15em;
+            z-index: 1000;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @media (max-width: 600px) {
+            .toast {
+                bottom: calc(16px + var(--safe-area-bottom));
+                padding: 12px 24px;
+                font-size: 14px;
+            }
         }
 
         .toast.show {
             transform: translateX(-50%) translateY(0);
-            opacity: 1;
+        }
+
+        .error-display {
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            min-height: 20px;
+            padding: 8px 0;
+        }
+
+        @media (max-width: 600px) {
+            .error-display {
+                font-size: 11px;
+                min-height: 18px;
+            }
+        }
+
+        .keyboard-hint {
+            display: none;
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 8px;
+        }
+
+        @media (hover: none) {
+            .keyboard-hint {
+                display: block;
+            }
+        }
+
+        .stats {
+            display: flex;
+            gap: 32px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+            margin-top: auto;
+        }
+
+        @media (max-width: 600px) {
+            .stats {
+                gap: 24px;
+                padding-top: 12px;
+            }
+        }
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .stat-value {
+            font-family: "Bebas Neue", Impact, sans-serif;
+            font-size: 28px;
+            line-height: 1;
+            color: var(--text);
+        }
+
+        @media (max-width: 600px) {
+            .stat-value {
+                font-size: 24px;
+            }
+        }
+
+        .stat-label {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--muted);
         }
 
         footer {
-            margin-top: 48px;
-            padding-top: 24px;
-            border-top: 1px solid var(--gray);
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-
-        .footer-text {
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
             font-size: 11px;
-            font-weight: 700;
+            font-weight: 500;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--gray);
+            letter-spacing: 0.15em;
+            color: var(--muted);
         }
 
-        .error-msg {
-            color: var(--accent);
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            min-height: 20px;
+        @media (max-width: 600px) {
+            footer {
+                padding-top: 20px;
+                font-size: 10px;
+            }
+        }
+
+        @media (orientation: landscape) and (max-height: 500px) {
+            footer {
+                padding-top: 12px;
+            }
+
+            header {
+                padding-bottom: 16px;
+            }
+
+            h1 {
+                font-size: clamp(36px, 12vh, 80px);
+            }
+        }
+
+        @media (max-width: 400px) {
+            header {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .mode-indicator {
+                align-items: flex-start;
+                width: 100%;
+            }
+
+            .mode-switch {
+                width: 100%;
+            }
+
+            .mode-btn {
+                flex: 1;
+                padding: 10px 8px;
+            }
+
+            /* .btn-sub {
+                display: none;
+            } */
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-in {
+            animation: slideIn 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            opacity: 0;
+        }
+
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+
+        @media (prefers-reduced-motion: reduce) {
+            .animate-in {
+                animation: none;
+                opacity: 1;
+            }
+
+            .toast {
+                transition: none;
+            }
+
+            .btn, .mode-btn {
+                transition: none;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>BITOTXT</h1>
-            <p class="tagline">Text ↔ Binary Converter</p>
+    <div class="page">
+        <header class="animate-in">
+            <div class="brand">
+                <h1>BITOTXT</h1>
+                <p class="subtitle">Text ↔ Binary Converter</p>
+            </div>
+            <div class="mode-indicator">
+                <span class="mode-label">Mode</span>
+                <div class="mode-switch">
+                    <button class="mode-btn active" data-mode="encode">
+                        <span class="btn-label">Encode</span>
+                        <span class="btn-sub">txt → 0101</span>
+                    </button>
+                    <button class="mode-btn" data-mode="decode">
+                        <span class="btn-label">Decode</span>
+                        <span class="btn-sub">0101 → txt</span>
+                    </button>
+                </div>
+            </div>
         </header>
 
-        <div class="converter">
-            <div class="panel">
-                <div class="panel-header">
-                    <span class="panel-label">Input</span>
-                    <div class="mode-toggle">
-                        <button class="mode-btn active" data-mode="encode">Encode</button>
-                        <button class="mode-btn" data-mode="decode">Decode</button>
+        <main>
+            <div class="panel animate-in delay-1">
+                <label class="panel-label" for="input">Input</label>
+                <div class="input-area">
+                    <textarea id="input" placeholder="Type anything here..."></textarea>
+                    <span class="char-count"><span id="charCount">0</span> chars</span>
+                </div>
+                <p class="keyboard-hint">Press Ctrl+Enter to convert</p>
+            </div>
+
+            <div class="panel animate-in delay-2">
+                <label class="panel-label" for="output">Output</label>
+                <textarea id="output" readonly placeholder="Result appears here..."></textarea>
+                <div class="error-display" id="error"></div>
+                <div class="stats">
+                    <div class="stat">
+                        <span class="stat-value" id="bitCount">0</span>
+                        <span class="stat-label">Bits</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value" id="byteCount">0</span>
+                        <span class="stat-label">Bytes</span>
                     </div>
                 </div>
-                <textarea id="input" placeholder="Enter text or binary here..."></textarea>
             </div>
+        </main>
 
-            <div class="panel">
-                <div class="panel-header">
-                    <span class="panel-label">Output</span>
-                    <span class="error-msg" id="error"></span>
-                </div>
-                <textarea id="output" readonly placeholder="Result will appear here..."></textarea>
-            </div>
-        </div>
-
-        <div class="actions">
-            <button class="btn btn-primary" id="convert">Convert</button>
+        <div class="actions animate-in delay-3">
+            <button class="btn btn-convert" id="convert">Convert</button>
             <button class="btn btn-secondary" id="copy">Copy</button>
             <button class="btn btn-secondary" id="clear">Clear</button>
         </div>
 
         <footer>
-            <span class="footer-text">Swiss Style Binary Converter</span>
-            <span class="footer-text">2026</span>
+            <span>Brutalist Binary Tool</span>
+            <span>2026</span>
         </footer>
     </div>
 
@@ -311,6 +637,9 @@
         const modeBtns = document.querySelectorAll('.mode-btn');
         const errorEl = document.getElementById('error');
         const toastEl = document.getElementById('toast');
+        const charCountEl = document.getElementById('charCount');
+        const bitCountEl = document.getElementById('bitCount');
+        const byteCountEl = document.getElementById('byteCount');
 
         function textToBinary(str) {
             return str.split('')
@@ -321,10 +650,28 @@
         function binaryToText(binary) {
             const cleanBinary = binary.replace(/\s/g, '');
             if (!/^[01]+$/.test(cleanBinary)) {
-                throw new Error('Invalid binary string');
+                throw new Error('Invalid binary — use only 0s and 1s');
+            }
+            if (cleanBinary.length % 8 !== 0) {
+                throw new Error('Invalid binary — must be multiple of 8 bits');
             }
             const bytes = cleanBinary.match(/.{1,8}/g) || [];
             return bytes.map(b => String.fromCharCode(parseInt(b, 2))).join('');
+        }
+
+        function updateStats(text, isBinary = false) {
+            if (isBinary) {
+                const cleanBinary = text.replace(/\s/g, '');
+                const bits = cleanBinary.length;
+                const bytes = Math.ceil(bits / 8);
+                bitCountEl.textContent = bits;
+                byteCountEl.textContent = bytes;
+            } else {
+                const bytes = new TextEncoder().encode(text).length;
+                const bits = bytes * 8;
+                bitCountEl.textContent = bits;
+                byteCountEl.textContent = bytes;
+            }
         }
 
         function convert() {
@@ -332,7 +679,7 @@
             const input = inputEl.value;
 
             if (!input.trim()) {
-                errorEl.textContent = 'Please enter some text';
+                errorEl.textContent = 'Enter some text first';
                 return;
             }
 
@@ -340,9 +687,11 @@
                 if (currentMode === 'encode') {
                     const result = textToBinary(input);
                     outputEl.value = result;
+                    updateStats(result, true);
                 } else {
                     const result = binaryToText(input);
                     outputEl.value = result;
+                    updateStats(result, false);
                 }
             } catch (e) {
                 errorEl.textContent = e.message || 'Conversion error';
@@ -355,6 +704,8 @@
 
             navigator.clipboard.writeText(output).then(() => {
                 showToast();
+            }).catch(() => {
+                errorEl.textContent = 'Copy failed';
             });
         }
 
@@ -362,6 +713,9 @@
             inputEl.value = '';
             outputEl.value = '';
             errorEl.textContent = '';
+            charCountEl.textContent = '0';
+            bitCountEl.textContent = '0';
+            byteCountEl.textContent = '0';
         }
 
         function showToast() {
@@ -384,8 +738,12 @@
         copyBtn.addEventListener('click', copyToClipboard);
         clearBtn.addEventListener('click', clearAll);
 
+        inputEl.addEventListener('input', () => {
+            charCountEl.textContent = inputEl.value.length;
+        });
+
         inputEl.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && e.ctrlKey) {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
                 convert();
             }
         });
